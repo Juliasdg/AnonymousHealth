@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Saúde – Anonimização e Machine Learning</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #fde7f2, #fff5fa);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .anim {
+      animation: fadeIn 0.25s ease-out;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-10 text-rose-900">
+
+  <!-- HEADER -->
+  <header class="text-center mb-12">
+    <h1 class="text-5xl font-extrabold tracking-tight text-rose-700">
+      Anonimização & ML
+    </h1>
+
+  </header>
+
+
+  <!-- AÇÕES PRINCIPAIS - GRID LUXUOSO PINK -->
+  <section class="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14 anim">
+
+    <button onclick="loadRaw()"
+      class="group p-6 rounded-2xl shadow-md bg-white border border-rose-200 hover:border-rose-400 hover:shadow-lg transition">
+      <h3 class="text-lg font-semibold text-rose-700 mb-1">
+        Dados Brutos
+      </h3>
+      <p class="text-sm text-rose-500 group-hover:text-rose-600">
+        Visualizar dataset original
+      </p>
+    </button>
+
+    <button onclick="loadAnonymized()"
+      class="group p-6 rounded-2xl shadow-md bg-white border border-rose-200 hover:border-rose-400 hover:shadow-lg transition">
+      <h3 class="text-lg font-semibold text-rose-700 mb-1">
+        Dados Anonimizados
+      </h3>
+      <p class="text-sm text-rose-500 group-hover:text-rose-600">
+        Versão segura do dataset
+      </p>
+    </button>
+
+    <button onclick="trainModel()"
+      class="group p-6 rounded-2xl shadow-md bg-white border border-rose-200 hover:border-rose-400 hover:shadow-lg transition">
+      <h3 class="text-lg font-semibold text-rose-700 mb-1">
+        Treinar Modelo
+      </h3>
+      <p class="text-sm text-rose-500 group-hover:text-rose-600">
+        Processar técnica DP
+      </p>
+    </button>
+
+    <button onclick="testar()"
+      class="group p-6 rounded-2xl shadow-md bg-white border border-rose-200 hover:border-rose-400 hover:shadow-lg transition">
+      <h3 class="text-lg font-semibold text-rose-700 mb-1">
+        Testar Anonimização
+      </h3>
+      <p class="text-sm text-rose-500 group-hover:text-rose-600">
+        Simular entrada sensível
+      </p>
+    </button>
+
+  </section>
+
+
+  <!-- BOTÃO PRINCIPAL -->
+  <div class="text-center mb-10 anim">
+    <button onclick="abrirModal()"
+      class="px-8 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-lg font-semibold shadow-md transition">
+      + Novo Paciente
+    </button>
+  </div>
+
+
+
+  <!-- OUTPUT -->
+  <section class="max-w-5xl mx-auto mt-10 bg-white rounded-2xl p-6 border border-rose-200 shadow anim">
+    <h2 class="text-xl font-semibold text-rose-700 mb-2">Resultado</h2>
+
+    <pre id="output"
+      class="bg-rose-50 text-rose-700 p-4 rounded-xl text-sm shadow-inner max-h-96 overflow-auto border border-rose-200">
+Clique em uma ação...
+</pre>
+  </section>
+
+  <br><br>
+  <!-- TABELA -->
+  <section class="max-w-5xl mx-auto bg-white rounded-2xl border border-rose-200 shadow anim">
+    <h2 class="text-xl font-bold text-rose-700 p-5 border-b border-rose-200">
+      Lista de Pacientes
+    </h2>
+
+    <table class="w-full text-left border-rose-200 text-rose-700   overflow-hidden">
+      <thead class="bg-rose-100 text-rose-700 border-b border-rose-300">
+        <tr>
+          <th class="th">Id</th>
+          <th class="th">Idade</th>
+          <th class="th">Sexo</th>
+          <th class="th">Cidade</th>
+          <th class="th">Glicemia</th>
+          <th class="th">Pressão</th>
+        </tr>
+      </thead>
+
+      <tbody id="tabela-body" class="divide-y divide-rose-200 bg-white"></tbody>
+    </table>
+  </section>
+
+
+
+  <!-- MODAL -->
+  <div id="modalCadastro"
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center z-50">
+
+    <div class="bg-white p-8 rounded-2xl shadow-2xl border border-rose-200 max-w-md w-full anim">
+
+      <h2 class="text-2xl font-semibold text-rose-700 mb-6 text-center">
+        Novo Paciente
+      </h2>
+
+      <form id="formPaciente" class="flex flex-col gap-4">
+        <input name="idade" placeholder="Idade" class="input" required>
+        <input name="sexo" placeholder="Sexo (M/F)" class="input" required>
+        <input name="cidade" placeholder="Cidade" class="input" required>
+        <input name="glicemia" placeholder="Glicemia" class="input" required>
+        <input name="pressao" placeholder="Pressão" class="input" required>
+
+        <button class="py-3 bg-rose-600 text-white font-medium rounded-xl shadow hover:bg-rose-700 transition">
+          Registrar
+        </button>
+      </form>
+
+      <button onclick="fecharModal()"
+        class="mt-4 w-full py-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-700 rounded-xl">
+        Fechar
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- SCRIPT -->
+  <script>
+    const API = "http://localhost:3001";
+
+    const show = (d) =>
+      document.getElementById("output").textContent =
+      JSON.stringify(d, null, 2);
+
+    const abrirModal = () => document.getElementById("modalCadastro").classList.remove("hidden");
+    const fecharModal = () => document.getElementById("modalCadastro").classList.add("hidden");
+
+    // CADASTRO
+    document.getElementById("formPaciente").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+
+      const dados = Object.fromEntries(form.entries());
+
+      const res = await fetch(API + "/patients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+
+      show(await res.json());
+      atualizarTabela();
+      e.target.reset();
+      fecharModal();
+    });
+
+    // LOAD RAW
+    async function loadRaw() {
+      const res = await fetch(API + "/api/data");
+      show(await res.json());
+    }
+
+    // LOAD ANONYMIZED
+    async function loadAnonymized() {
+      const res = await fetch(API + "/api/data/anonymized");
+      show(await res.json());
+    }
+
+    // TRAIN
+    async function trainModel() {
+      const res = await fetch(API + "/api/train", { method: "POST" });
+      show(await res.json());
+    }
+
+    // TEST
+    async function testar() {
+      const res = await fetch(API + "/api/anonymize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome: "Paciente Exemplo" })
+      });
+      show(await res.json());
+    }
+
+    // TABELA
+    async function atualizarTabela() {
+      const res = await fetch(API + "/api/data");
+      const lista = await res.json();
+
+      const tbody = document.getElementById("tabela-body");
+      tbody.innerHTML = "";
+
+      lista.forEach((p, i) => {
+        tbody.innerHTML += `
+    <tr class="transition ${i % 2 === 0 ? 'bg-rose-50/40' : 'bg-white'} hover:bg-rose-100">
+      
+      <td class="td">${p.id}</td>
+      <td class="td">${p.idade}</td>
+      <td class="td">${p.sexo}</td>
+      <td class="td">${p.cidade}</td>
+      <td class="td">${p.glicemia}</td>
+      <td class="td">${p.pressao}</td>
+    </tr>
+  `;
+      });
+
+    }
+
+    atualizarTabela();
+  </script>
+
+  <style>
+    .input {
+      /* não podemos usar @apply, então usamos CSS normal */
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid #f9a8d4;
+      /* rose-300 */
+      outline: none;
+    }
+
+    .input:focus {
+      box-shadow: 0 0 0 3px rgb(251 113 133 / 0.4);
+      /* ring-rose-400 */
+    }
+
+    /* TH estilizada manualmente */
+    .th {
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #be185d;
+      /* rose-700 */
+      border-right: 1px solid #fecdd3;
+      /* rose-200 */
+    }
+
+    /* TD estilizada manualmente */
+    .td {
+      padding: 0.75rem 1.25rem;
+      color: #404040;
+      /* neutral-700 */
+      border-right: 1px solid #ffe4e6;
+      /* rose-100 */
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+  </style>
+
+
+</body>
+
+</html>
